@@ -1,0 +1,42 @@
+The Office: Dunder Mifflin Organizational Chart
+
+CREATE  (mscott:employee:senior{name:"Michael Scott",title:"Regional Manager"}),
+	(jhalpert:employee:senior{name:"Jim Halpert",title:"Assistant Regional Manager"}),
+	(dschrute:employee{name:"Dwight Schrute",title:"Assistant to the Regional Manager"}),
+	(abernard:employee:senior{name:"Andy Bernard",title:"Regional Director in Charge of Sales"}),
+	(amartin:employee:senior{name:"Angela Martin",title:"Senior Accountant"}),
+	(mpalmer:employee:mid{name:"Meredith Palmer",title:"Supplier Relations"}),
+	(kkapoor:employee:mid{name:"Kelly Kapoor",title:"Customer Service Representative"}),
+	(tflenderson:employee:mid{name:"Toby Flenderson",title:"Human Resources"}),
+	(cbratton:employee:mid{name:"Creed Bratton",title:"Quality Assurance Representative"}),
+	(omartinez:employee:junior{name:"Oscar Martinez",title:"Accountant"}),
+	(kmalone:employee:junior{name:"Kevin Malone",title:"Accountant"}),
+	(shudson:employee:junior{name:"Stanley Hudson",title:"Sales Representative"}),
+	(pvance:employee:junior{name:"Phyllis Vance",title:"Sales Representative"});
+
+MATCH 	(mscott:employee:senior{name:"Michael Scott",title:"Regional Manager"}),
+	(a:employee)
+WHERE   NOT a:junior AND NOT (a.name = "Michael Scott")
+CREATE	(mscott)-[r:SUPERVISES {type:"directly"}]->(a)
+CREATE 	(a)-[v:SUPERVISED_BY {type:"directly"}]->(mscott);
+
+MATCH 	(mscott:employee:senior{name:"Michael Scott",title:"Regional Manager"}),
+	(a:employee:junior)
+CREATE	(mscott)-[r:SUPERVISES {type:"indirectly"}]->(a)
+CREATE 	(a)-[v:SUPERVISED_BY {type:"indirectly"}]->(mscott);
+
+MATCH 	(amartin:employee:senior{name:"Angela Martin",title:"Senior Accountant"}),
+	(a:employee:junior)
+WHERE   (a.title = "Accountant")
+CREATE	(amartin)-[r:SUPERVISES {type:"directly"}]->(a)
+CREATE 	(a)-[v:SUPERVISED_BY {type:"directly"}]->(amartin);
+
+MATCH 	(abernard:employee:senior{name:"Andy Bernard",title:"Regional Director in Charge of Sales"}),
+	(a:employee:junior)
+WHERE   (a.title = "Sales Representative")
+CREATE	(abernard)-[r:SUPERVISES {type:"directly"}]->(a)
+CREATE 	(a)-[v:SUPERVISED_BY {type:"directly"}]->(abernard);
+	
+MATCH 	(amartin:employee:senior {name: "Angela Martin"})-[r]->(b:employee)
+RETURN  type(r), b.name, b.title;
+
